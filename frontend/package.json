@@ -1,0 +1,11 @@
+{
+  "name": "loputoo-frontend",
+  "version": "1.0.0",
+  "description": "Ametikooli lõputöö frontend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lauri-Viljan Vastisson",
+  "license": "ISC"
+}
