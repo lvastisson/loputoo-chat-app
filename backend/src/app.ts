@@ -22,6 +22,12 @@ io.on("connection", (socket) => {
 
   socket.emit("hello", "ühendus olemas");
 
+  socket.emit("message", "[server] ühendus loodud");
+
+  socket.on("message", function (data) {
+    io.emit("message", data);
+  });
+
   socket.on("disconnect", function () {
     console.log("user disconnected");
   });

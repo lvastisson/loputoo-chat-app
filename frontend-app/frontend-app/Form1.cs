@@ -14,7 +14,15 @@ namespace frontend_app
 {
     public partial class Form1 : Form
     {
-        public delegate void UpdateLabelMethod(string text, bool isLabel1);
+        public delegate void UpdateLabelMethod(string text);
+        public delegate void UpdateMessagesMethod(string text);
+
+        string serverAddress = "http://localhost:8888/";
+
+        Random rnd = new Random();
+
+        SocketIO client = null;
+
         public Form1()
         {
             InitializeComponent();
@@ -22,52 +30,81 @@ namespace frontend_app
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            userNameTextBox.Text = $"user_{rnd.Next(1111, 9999)}";
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             Debug.WriteLine("clicked");
+
+            if (serverIPTextBox.Text != "")
+            {
+                serverAddress = serverIPTextBox.Text;
+            }
+
             socketIoManager();
+
+            button1.Enabled = false;
+            sendMessageBtn.Enabled = true;
         }
 
         private async void socketIoManager()
         {
-            var client = new SocketIO("http://localhost:8888/");
+            client = new SocketIO("http://localhost:8888/");
             Debug.WriteLine("past socket initalization");
 
             client.OnConnected += async (sender, e) =>
             {
                 Debug.WriteLine("ühendatud");
-                UpdateStatus("ühendatud", false);
             };
 
             client.On("hello", (data) =>
             {
                 Debug.WriteLine(data.GetValue<string>());
-                UpdateStatus(data.GetValue<string>(), true);
+                UpdateStatus(data.GetValue<string>());
+            });
+
+            client.On("message", (data) =>
+            {
+                AddMessage(data.GetValue<string>());
             });
 
             await client.ConnectAsync();
         }
 
-        private void UpdateStatus(string text, bool isLabel1)
+        private void UpdateStatus(string text)
         {
-            if (isLabel1 ? this.label1.InvokeRequired : this.label2.InvokeRequired)
+            if (this.label1.InvokeRequired)
             {
                 UpdateLabelMethod del = new UpdateLabelMethod(UpdateStatus);
-                this.Invoke(del, new object[] { text, isLabel1 });
+                this.Invoke(del, new object[] { text });
             }
             else
             {
-                if (isLabel1)
-                {
-                    this.label1.Text = text;
-                } else
-                {
-                    this.label2.Text = text;
-                }
+                this.label1.Text = text;
             }
+        }
+
+        private void AddMessage(string text)
+        {
+            if (this.listBox1.InvokeRequired)
+            {
+                UpdateMessagesMethod del = new UpdateMessagesMethod(AddMessage);
+                this.Invoke(del, new object[] { text });
+            } else
+            {
+                this.listBox1.Items.Add(text);
+            }
+        }
+
+        private void sendMessageBtn_Click(object sender, EventArgs e)
+        {
+            if (client != null)
+            {
+                client.EmitAsync("message", $"[{userNameTextBox.Text}] {userMsgTextBox.Text}");
+            }
+
+            userMsgTextBox.Text = "";
         }
     }
 }
