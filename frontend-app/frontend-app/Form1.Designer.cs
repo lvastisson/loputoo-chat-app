@@ -85,6 +85,7 @@ namespace frontend_app
             this.userMsgTextBox.Name = "userMsgTextBox";
             this.userMsgTextBox.Size = new System.Drawing.Size(247, 20);
             this.userMsgTextBox.TabIndex = 5;
+            this.userMsgTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDownHandler);
             // 
             // label3
             // 
@@ -107,6 +108,7 @@ namespace frontend_app
             // userNameTextBox
             // 
             this.userNameTextBox.Location = new System.Drawing.Point(48, 249);
+            this.userNameTextBox.MaxLength = 20;
             this.userNameTextBox.Name = "userNameTextBox";
             this.userNameTextBox.Size = new System.Drawing.Size(90, 20);
             this.userNameTextBox.TabIndex = 8;

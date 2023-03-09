@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Windows.Forms;
 
 namespace frontend_app
@@ -50,7 +51,7 @@ namespace frontend_app
 
         private async void socketIoManager()
         {
-            client = new SocketIO("http://localhost:8888/");
+            client = new SocketIO(serverAddress);
             Debug.WriteLine("past socket initalization");
 
             client.OnConnected += async (sender, e) =>
@@ -94,10 +95,25 @@ namespace frontend_app
             } else
             {
                 this.listBox1.Items.Add(text);
+                this.listBox1.SelectedIndex = this.listBox1.Items.Count - 1;
             }
         }
 
         private void sendMessageBtn_Click(object sender, EventArgs e)
+        {
+            SendMessage();
+        }
+
+        private void OnKeyDownHandler(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                SendMessage();
+            }
+
+        }
+
+        private void SendMessage()
         {
             if (client != null)
             {

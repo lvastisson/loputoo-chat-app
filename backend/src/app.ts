@@ -17,15 +17,19 @@ const app: Application = express();
 
 const io = new Server(8888);
 
+const getTime = () => {
+  return new Date().toISOString().split("T")[1].substring(0, 8);
+};
+
 io.on("connection", (socket) => {
   console.log("user connected");
 
   socket.emit("hello", "ühendus olemas");
 
-  socket.emit("message", "[server] ühendus loodud");
+  socket.emit("message", `[${getTime()}] SERVER: ühendus loodud`);
 
   socket.on("message", function (data) {
-    io.emit("message", data);
+    io.emit("message", `[${getTime()}] ${data}`);
   });
 
   socket.on("disconnect", function () {
