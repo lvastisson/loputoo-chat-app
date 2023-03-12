@@ -18,7 +18,7 @@ namespace frontend_app
         public delegate void UpdateLabelMethod(string text);
         public delegate void UpdateMessagesMethod(string text);
 
-        string serverAddress = "http://localhost:8888/";
+        string serverAddress = "http://localhost:5001/";
 
         Random rnd = new Random();
 
@@ -115,11 +115,9 @@ namespace frontend_app
 
         private void SendMessage()
         {
-            if (client != null)
-            {
-                client.EmitAsync("message", $"[{userNameTextBox.Text}] {userMsgTextBox.Text}");
-            }
+            if (client == null || userMsgTextBox.Text.Length <= 0) return;
 
+            client.EmitAsync("message", $"[{userNameTextBox.Text}] {userMsgTextBox.Text}");
             userMsgTextBox.Text = "";
         }
     }

@@ -129,7 +129,7 @@ namespace frontend_app
             this.serverIPTextBox.Name = "serverIPTextBox";
             this.serverIPTextBox.Size = new System.Drawing.Size(187, 20);
             this.serverIPTextBox.TabIndex = 10;
-            this.serverIPTextBox.Text = "http://10.136.148.194:8888/";
+            this.serverIPTextBox.Text = "http://localhost:5001/";
             // 
             // Form1
             // 

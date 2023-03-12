@@ -2,14 +2,13 @@ import express, { Application } from "express";
 import { connectToDatabase } from "./services/database.service";
 import { messagesRouter } from "./routes/messages.router";
 import { Server } from "socket.io";
-// import { createServer } from "http";
+
+const API_PORT = parseInt(process.env.API_PORT as string) || 5000;
+const SOCKET_PORT = parseInt(process.env.SOCKET_PORT as string) || 5001;
 
 const app: Application = express();
 
-// const server = createServer(app);
-// const io = new Server(server);
-
-const io = new Server(8888);
+const io = new Server(SOCKET_PORT);
 
 const getTime = () => {
   return new Date().toISOString().split("T")[1].substring(0, 8);
@@ -31,17 +30,15 @@ io.on("connection", (socket) => {
   });
 });
 
-const port = 5000;
-
 connectToDatabase()
   .then(() => {
     app.use("/messages", messagesRouter);
 
-    app.listen(port, () => {
-      console.log(`Server started at http://localhost:${port}`);
+    app.listen(API_PORT, () => {
+      console.log(`Server started at http://localhost:${API_PORT}`);
     });
   })
   .catch((error: Error) => {
-    console.error("Database connection failed", error);
+    console.error("ERROR: Database connection failed", error);
     process.exit();
   });
