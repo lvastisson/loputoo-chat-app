@@ -6,6 +6,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
@@ -15,8 +16,9 @@ namespace frontend_app
 {
     public partial class Form1 : Form
     {
-        public delegate void UpdateLabelMethod(string text);
+        public delegate void UpdateLabelMethod(string text, bool error);
         public delegate void UpdateMessagesMethod(string text);
+        public static bool isRunning = false;
 
         string serverAddress = "http://localhost:5001/";
 
@@ -51,38 +53,67 @@ namespace frontend_app
 
         private async void socketIoManager()
         {
-            client = new SocketIO(serverAddress);
-            Debug.WriteLine("past socket initalization");
+            AddMessage($"socketIoManager called, isrunning: {isRunning}");
 
-            client.OnConnected += async (sender, e) =>
+            if (isRunning) return;
+
+            isRunning = true;
+
+            try
             {
-                Debug.WriteLine("ühendatud");
-            };
+                client = new SocketIO(serverAddress);
+                Debug.WriteLine("past socket initalization");
 
-            client.On("hello", (data) =>
+                client.OnConnected += async (sender, e) =>
+                {
+                    Debug.WriteLine("ühendatud");
+                };
+
+                client.OnDisconnected += async (sender, e) =>
+                {
+                    UpdateStatus("Disconnected", true);
+                };
+
+                client.On("hello", (data) =>
+                {
+                    Debug.WriteLine(data.GetValue<string>());
+                    UpdateStatus(data.GetValue<string>());
+                });
+
+                client.On("message", (data) =>
+                {
+                    AddMessage(data.GetValue<string>());
+                });
+
+                await client.ConnectAsync();
+            }
+            catch
             {
-                Debug.WriteLine(data.GetValue<string>());
-                UpdateStatus(data.GetValue<string>());
-            });
-
-            client.On("message", (data) =>
-            {
-                AddMessage(data.GetValue<string>());
-            });
-
-            await client.ConnectAsync();
+                isRunning = false;
+                UpdateStatus("Unable to connect, will keep retrying...", true);
+                await Task.Delay(3000);
+                socketIoManager();
+            }
         }
 
-        private void UpdateStatus(string text)
+        private void UpdateStatus(string text, bool error = false)
         {
             if (this.label1.InvokeRequired)
             {
                 UpdateLabelMethod del = new UpdateLabelMethod(UpdateStatus);
-                this.Invoke(del, new object[] { text });
+                this.Invoke(del, new object[] { text, error });
             }
             else
             {
                 this.label1.Text = text;
+
+                if (error)
+                {
+                    label1.ForeColor = Color.Red;
+                } else
+                {
+                    label1.ForeColor = Color.Green;
+                }
             }
         }
 
@@ -113,11 +144,17 @@ namespace frontend_app
 
         }
 
+        public class MessageDTO
+        {
+            public string name { get; set; }
+            public string message { get; set; }
+        }
+
         private void SendMessage()
         {
             if (client == null || userMsgTextBox.Text.Length <= 0) return;
 
-            client.EmitAsync("message", $"[{userNameTextBox.Text}] {userMsgTextBox.Text}");
+            client.EmitAsync("message", new MessageDTO { name = userNameTextBox.Text, message = userMsgTextBox.Text });
             userMsgTextBox.Text = "";
         }
     }

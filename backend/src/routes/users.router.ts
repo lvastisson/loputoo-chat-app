@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { ObjectId } from "mongodb";
 import { collections } from "../services/database.service";
 import User from "../models/user";
-import { LoginDto, RegisterDto } from "../interfaces/useractions.interfaces";
+import { LoginDto, RegisterDto } from "../interfaces/API/useractions.interfaces";
 import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 

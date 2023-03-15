@@ -3,6 +3,7 @@ import { connectToDatabase } from "./services/database.service";
 import { messagesRouter } from "./routes/messages.router";
 import { Server } from "socket.io";
 import { usersRouter } from "./routes/users.router";
+import { MessageDTO } from "./interfaces/Socket/message.intefaces";
 
 const API_PORT = parseInt(process.env.API_PORT as string) || 5000;
 const SOCKET_PORT = parseInt(process.env.SOCKET_PORT as string) || 5001;
@@ -22,8 +23,8 @@ io.on("connection", (socket) => {
 
   socket.emit("message", `[${getTime()}] SERVER: ühendus loodud`);
 
-  socket.on("message", function (data) {
-    io.emit("message", `[${getTime()}] ${data}`);
+  socket.on("message", function (data: MessageDTO) {
+    if (data.message.length > 0) io.emit("message", `[${getTime()}] [${data.name}] ${data.message}`);
   });
 
   socket.on("disconnect", function () {
