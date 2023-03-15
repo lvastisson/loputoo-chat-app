@@ -137,11 +137,11 @@ namespace frontend_app
 
         private void OnKeyDownHandler(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
+            if (e.KeyCode == Keys.Enter && e.Modifiers != Keys.Shift)
             {
                 SendMessage();
+                e.SuppressKeyPress = true;
             }
-
         }
 
         public class MessageDTO
