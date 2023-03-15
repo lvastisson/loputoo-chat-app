@@ -157,5 +157,25 @@ namespace frontend_app
             client.EmitAsync("message", new MessageDTO { name = userNameTextBox.Text, message = userMsgTextBox.Text });
             userMsgTextBox.Text = "";
         }
+
+        private void listBox1_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            e.DrawBackground();
+            e.DrawFocusRectangle();
+            e.Graphics.DrawString(listBox1.Items[e.Index].ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds);
+        }
+
+        private void listBox1_MeasureItem(object sender, MeasureItemEventArgs e)
+        {
+            e.ItemHeight = (int)e.Graphics.MeasureString(listBox1.Items[e.Index].ToString(), listBox1.Font, listBox1.Width).Height;
+        }
+
+        private int GetLinesNumber(string text)
+        {
+            int count = 1;
+            int pos = 0;
+            while ((pos = text.IndexOf("\r\n", pos)) != -1) { count++; pos += 2; }
+            return count;
+        }
     }
 }

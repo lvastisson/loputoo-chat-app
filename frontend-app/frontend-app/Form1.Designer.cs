@@ -64,16 +64,19 @@ namespace frontend_app
             // 
             // listBox1
             // 
+            this.listBox1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.listBox1.FormattingEnabled = true;
             this.listBox1.Location = new System.Drawing.Point(16, 78);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(360, 160);
             this.listBox1.TabIndex = 3;
+            this.listBox1.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listBox1_DrawItem);
+            this.listBox1.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.listBox1_MeasureItem);
             // 
             // sendMessageBtn
             // 
             this.sendMessageBtn.Enabled = false;
-            this.sendMessageBtn.Location = new System.Drawing.Point(301, 272);
+            this.sendMessageBtn.Location = new System.Drawing.Point(301, 306);
             this.sendMessageBtn.Name = "sendMessageBtn";
             this.sendMessageBtn.Size = new System.Drawing.Size(75, 23);
             this.sendMessageBtn.TabIndex = 4;
@@ -84,8 +87,9 @@ namespace frontend_app
             // userMsgTextBox
             // 
             this.userMsgTextBox.Location = new System.Drawing.Point(48, 274);
+            this.userMsgTextBox.Multiline = true;
             this.userMsgTextBox.Name = "userMsgTextBox";
-            this.userMsgTextBox.Size = new System.Drawing.Size(247, 20);
+            this.userMsgTextBox.Size = new System.Drawing.Size(247, 55);
             this.userMsgTextBox.TabIndex = 5;
             this.userMsgTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDownHandler);
             // 
@@ -137,7 +141,7 @@ namespace frontend_app
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(388, 306);
+            this.ClientSize = new System.Drawing.Size(398, 341);
             this.Controls.Add(this.serverIPTextBox);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.userNameTextBox);
