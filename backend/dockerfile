@@ -1,0 +1,23 @@
+FROM node:16
+
+# Teeb serverile oma kausta
+WORKDIR /usr/src/app
+
+# kopeerib üle nodejs package failid
+COPY package*.json ./
+
+# nodejs packages installimine
+RUN npm install
+
+# kopeerib koodi üle
+COPY . .
+
+# kompileerib TS failid
+RUN npm run build
+
+# portide avamine
+EXPOSE 5000
+EXPOSE 5001
+
+# serveri jooksutamine
+CMD [ "node", "./dist/app.js" ]
