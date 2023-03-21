@@ -12,7 +12,7 @@ export async function connectToDatabase() {
   console.log(`Successfully coonnected to databse: ${db.databaseName}`);
 
   try {
-    const messagesCollection: mongoDB.Collection = db.collection(process.env.MESSAGES_COLLECTION_NAME as string);
+    const messagesCollection: mongoDB.Collection = db.collection("messages");
     collections.messages = messagesCollection;
     console.log(`Successfully connected to collection: ${messagesCollection.collectionName}`);
   } catch {
@@ -20,7 +20,7 @@ export async function connectToDatabase() {
   }
 
   try {
-    const usersCollection: mongoDB.Collection = db.collection(process.env.USERS_COLLECTION_NAME as string);
+    const usersCollection: mongoDB.Collection = db.collection("users");
     collections.users = usersCollection;
     console.log(`Successfully connected to collection: ${usersCollection.collectionName}`);
   } catch {
