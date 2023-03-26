@@ -4,6 +4,7 @@ import { messagesRouter } from "./routes/messages.router";
 import { Server } from "socket.io";
 import { usersRouter } from "./routes/users.router";
 import { MessageDTO } from "./interfaces/Socket/message.intefaces";
+import { statusRouter } from "./routes/status.router";
 
 const API_PORT = parseInt(process.env.API_PORT as string) || 5000;
 const SOCKET_PORT = parseInt(process.env.SOCKET_PORT as string) || 5001;
@@ -37,6 +38,8 @@ connectToDatabase()
     app.use("/messages", messagesRouter);
 
     app.use("/users", usersRouter);
+
+    app.use("/status", statusRouter);
 
     app.listen(API_PORT, () => {
       console.log(`Server started at http://localhost:${API_PORT}`);
