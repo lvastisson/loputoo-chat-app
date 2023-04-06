@@ -5,6 +5,15 @@ import { Server } from "socket.io";
 import { usersRouter } from "./routes/users.router";
 import { MessageDTO } from "./interfaces/Socket/message.intefaces";
 import { statusRouter } from "./routes/status.router";
+import { UserSession } from "./interfaces/session.interfaces";
+
+declare global {
+  namespace Express {
+    export interface Request {
+      session?: UserSession;
+    }
+  }
+}
 
 const API_PORT = parseInt(process.env.API_PORT as string) || 5000;
 

@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { ObjectId } from "mongodb";
 import { collections } from "../services/database.service";
 import Message from "../models/message";
-import isAuth from '../middlewares/isAuth';
+import isAuth from "../middlewares/isAuth";
 
 export const messagesRouter = express.Router();
 
