@@ -40,10 +40,10 @@ usersRouter.post("/login", async (req: Request, res: Response) => {
     const { email, password } = req.body as LoginDto;
 
     const user = (await collections.users?.findOne<User>({ email: email })) as User;
-    if (!user) return res.status(400).send(`User with email ${email} doesn't exist`);
+    if (!user) return res.status(400).send({ message: `User with email ${email} doesn't exist`});
 
     const passwordMatches = await bcrypt.compare(password, user.passwordHash);
-    if (!passwordMatches) return res.status(400).send("Wrong password");
+    if (!passwordMatches) return res.status(400).send({ message: "Wrong password" });
 
     const generatedRandomID = crypto.randomBytes(8).toString("hex");
 
