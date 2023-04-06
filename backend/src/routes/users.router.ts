@@ -5,6 +5,7 @@ import User from "../models/user";
 import { LoginDto, RegisterDto } from "../interfaces/API/useractions.interfaces";
 import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
+import isAuth from "../middlewares/isAuth";
 
 export const usersRouter = express.Router();
 
@@ -54,6 +55,25 @@ usersRouter.post("/login", async (req: Request, res: Response) => {
     result
       ? res.status(201).send(`Successfully generated session for user ${user.username} with id ${generatedRandomID}`)
       : res.status(500).send("Failed to generate session");
+  } catch (error: any) {
+    console.error(error);
+    res.status(400).send(error.message);
+  }
+});
+
+usersRouter.post("/logout", isAuth, async (req: Request, res: Response) => {
+  try {
+    const user = (await collections.users?.findOne<User>({ sessionId: req.session?.sessionid })) as User;
+    if (!user) return res.status(400).send(`Session doesn't exist`);
+
+    const result = await collections.users?.updateOne(
+      { _id: new ObjectId(user.id) },
+      { $set: { sessionId: '' } }
+    );
+
+    result
+      ? res.status(201).send(`Successfully logged out user ${user.username} with id ${user.sessionId}`)
+      : res.status(500).send("Failed to logout");
   } catch (error: any) {
     console.error(error);
     res.status(400).send(error.message);
