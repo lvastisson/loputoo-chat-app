@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
@@ -19,8 +21,9 @@ namespace frontend_app
         public delegate void UpdateLabelMethod(string text, bool error);
         public delegate void UpdateMessagesMethod(string text);
         public static bool isRunning = false;
+        public static string sessionToken = "";
 
-        string serverAddress = "http://localhost:5001/";
+        string serverAddress = "http://localhost:5001";
 
         Random rnd = new Random();
 
@@ -38,8 +41,6 @@ namespace frontend_app
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Debug.WriteLine("clicked");
-
             if (serverIPTextBox.Text != "")
             {
                 serverAddress = serverIPTextBox.Text;
@@ -150,6 +151,20 @@ namespace frontend_app
             public string message { get; set; }
         }
 
+        public class LoginDTO
+        {
+            public string email { get; set; }
+
+            public string password { get; set; }
+        }
+
+        public class ResponseDTO
+        {
+            public string message { get; set; }
+
+            public string token { get; set; }
+        }
+
         private void SendMessage()
         {
             if (client == null || userMsgTextBox.Text.Length <= 0) return;
@@ -170,12 +185,35 @@ namespace frontend_app
             e.ItemHeight = (int)e.Graphics.MeasureString(listBox1.Items[e.Index].ToString(), listBox1.Font, listBox1.Width).Height;
         }
 
-        private int GetLinesNumber(string text)
+        private async void Login()
         {
-            int count = 1;
-            int pos = 0;
-            while ((pos = text.IndexOf("\r\n", pos)) != -1) { count++; pos += 2; }
-            return count;
+            var myJson = Newtonsoft.Json.JsonConvert.SerializeObject(new LoginDTO { email = emailTextBox.Text, password = passwordTextBox.Text });
+
+            using (var client = new HttpClient())
+            {
+                var response = await client.PostAsync(
+                    $"{serverAddress}/users/login",
+                     new StringContent(myJson, Encoding.UTF8, "application/json"));
+
+                var contents = await response.Content.ReadAsStringAsync();
+                var responseObj = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDTO>(contents);
+
+                if (responseObj.token != null)
+                {
+                    sessionTokenLabel.Text = $"session: {responseObj.token}";
+                    sessionToken = responseObj.token;
+                }
+            }
+        }
+
+        private void loginBtn_Click(object sender, EventArgs e)
+        {
+            if (serverIPTextBox.Text != "")
+            {
+                serverAddress = serverIPTextBox.Text;
+            }
+
+            Login();
         }
     }
 }

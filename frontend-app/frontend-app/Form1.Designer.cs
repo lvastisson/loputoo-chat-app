@@ -39,6 +39,10 @@ namespace frontend_app
             this.userNameTextBox = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.serverIPTextBox = new System.Windows.Forms.TextBox();
+            this.loginBtn = new System.Windows.Forms.Button();
+            this.emailTextBox = new System.Windows.Forms.TextBox();
+            this.passwordTextBox = new System.Windows.Forms.TextBox();
+            this.sessionTokenLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -135,13 +139,49 @@ namespace frontend_app
             this.serverIPTextBox.Name = "serverIPTextBox";
             this.serverIPTextBox.Size = new System.Drawing.Size(187, 20);
             this.serverIPTextBox.TabIndex = 10;
-            this.serverIPTextBox.Text = "http://localhost:5001/";
+            this.serverIPTextBox.Text = "http://localhost:5001";
+            // 
+            // loginBtn
+            // 
+            this.loginBtn.Location = new System.Drawing.Point(563, 198);
+            this.loginBtn.Name = "loginBtn";
+            this.loginBtn.Size = new System.Drawing.Size(75, 23);
+            this.loginBtn.TabIndex = 11;
+            this.loginBtn.Text = "Login";
+            this.loginBtn.UseVisualStyleBackColor = true;
+            this.loginBtn.Click += new System.EventHandler(this.loginBtn_Click);
+            // 
+            // emailTextBox
+            // 
+            this.emailTextBox.Location = new System.Drawing.Point(424, 146);
+            this.emailTextBox.Name = "emailTextBox";
+            this.emailTextBox.Size = new System.Drawing.Size(214, 20);
+            this.emailTextBox.TabIndex = 12;
+            // 
+            // passwordTextBox
+            // 
+            this.passwordTextBox.Location = new System.Drawing.Point(424, 172);
+            this.passwordTextBox.Name = "passwordTextBox";
+            this.passwordTextBox.Size = new System.Drawing.Size(214, 20);
+            this.passwordTextBox.TabIndex = 13;
+            // 
+            // sessionTokenLabel
+            // 
+            this.sessionTokenLabel.AutoSize = true;
+            this.sessionTokenLabel.Location = new System.Drawing.Point(286, 17);
+            this.sessionTokenLabel.Name = "sessionTokenLabel";
+            this.sessionTokenLabel.Size = new System.Drawing.Size(0, 13);
+            this.sessionTokenLabel.TabIndex = 14;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(398, 341);
+            this.ClientSize = new System.Drawing.Size(678, 341);
+            this.Controls.Add(this.sessionTokenLabel);
+            this.Controls.Add(this.passwordTextBox);
+            this.Controls.Add(this.emailTextBox);
+            this.Controls.Add(this.loginBtn);
             this.Controls.Add(this.serverIPTextBox);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.userNameTextBox);
@@ -174,6 +214,10 @@ namespace frontend_app
         private System.Windows.Forms.TextBox userNameTextBox;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox serverIPTextBox;
+        private System.Windows.Forms.Button loginBtn;
+        private System.Windows.Forms.TextBox emailTextBox;
+        private System.Windows.Forms.TextBox passwordTextBox;
+        private System.Windows.Forms.Label sessionTokenLabel;
     }
 }
 
