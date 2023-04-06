@@ -163,7 +163,7 @@ namespace frontend_app
             public string password { get; set; }
         }
 
-        public class ResponseDTO
+        public class UserResponseDTO
         {
             public string message { get; set; }
 
@@ -202,11 +202,33 @@ namespace frontend_app
             passwordTextBox.Clear();
         }
 
+        private async void LoadPreviousMessages()
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + sessionToken);
+                var response = await client.GetAsync($"{serverAddress}/messages");
+
+                var bodyContents = await response.Content.ReadAsStringAsync();
+                var responseObj = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(bodyContents);
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    for (int i = 0; i < responseObj.Length; i++)
+                    {
+                        listBox1.Items.Add(responseObj[i]);
+                    }
+                }
+            }
+        }
+
         private void InitializeChat()
         {
             UpdateIpVar();
 
             socketIoManager();
+
+            LoadPreviousMessages();
 
             sendMessageBtn.Enabled = true;
             userMsgTextBox.Enabled = true;
@@ -231,7 +253,7 @@ namespace frontend_app
                      new StringContent(loginObj, Encoding.UTF8, "application/json"));
 
                 var bodyContents = await response.Content.ReadAsStringAsync();
-                var responseObj = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDTO>(bodyContents);
+                var responseObj = Newtonsoft.Json.JsonConvert.DeserializeObject<UserResponseDTO>(bodyContents);
 
                 if (responseObj.token != null)
                 {
@@ -269,7 +291,7 @@ namespace frontend_app
                      new StringContent(registerObj, Encoding.UTF8, "application/json"));
 
                 var bodyContents = await response.Content.ReadAsStringAsync();
-                var responseObj = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDTO>(bodyContents);
+                var responseObj = Newtonsoft.Json.JsonConvert.DeserializeObject<UserResponseDTO>(bodyContents);
 
                 if (responseObj.message != null)
                 {

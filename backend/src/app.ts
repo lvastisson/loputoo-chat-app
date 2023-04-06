@@ -53,7 +53,12 @@ connectToDatabase()
         if (!user) return;
 
         if (data.message.length > 0) {
-          const newMessage = { userId: user._id || "null", message: data.message, time: getTime() } as Message;
+          const newMessage = {
+            userId: user._id || "null",
+            username: user.username,
+            message: data.message,
+            time: getTime(),
+          } as Message;
           const result = await collections.messages?.insertOne(newMessage);
 
           if (result) io.emit("message", `[${getTime()}] [${user.username}] ${data.message}`);

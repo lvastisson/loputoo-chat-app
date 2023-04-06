@@ -10,9 +10,19 @@ messagesRouter.use(express.json());
 
 messagesRouter.get("/", isAuth, async (req: Request, res: Response) => {
   try {
-    const messages = (await collections.messages?.find<Message>({}).toArray()) as Message[];
+    const messagesToLoad = 100;
+    const messageCount = await collections.messages?.countDocuments();
+    // get only last N messages
+    const messages = (await collections.messages
+      ?.find<Message>({})
+      .skip(messageCount || 0 < messagesToLoad ? 0 : messageCount || messagesToLoad - messagesToLoad)
+      .toArray()) as Message[];
 
-    res.status(200).send(messages);
+    const parsedMessages = messages.map((el) => {
+      return `[${el.time}] [${el.username}] ${el.message}`;
+    });
+
+    res.status(200).send(parsedMessages);
   } catch (error: any) {
     res.status(500).send(error.message);
   }
@@ -20,7 +30,7 @@ messagesRouter.get("/", isAuth, async (req: Request, res: Response) => {
 
 messagesRouter.post("/", isAuth, async (req: Request, res: Response) => {
   try {
-    const newMessage = { ...req.body, userId: req.session?.userid } as Message;
+    const newMessage = { ...req.body, userId: req.session?.userid, username: req.session?.username } as Message;
     const result = await collections.messages?.insertOne(newMessage);
 
     result
