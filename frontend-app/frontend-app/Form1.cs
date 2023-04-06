@@ -23,7 +23,7 @@ namespace frontend_app
         public static bool isRunning = false;
         public static string sessionToken = "";
 
-        string serverAddress = "http://localhost:5001";
+        string serverAddress = "http://localhost:5000";
 
         Random rnd = new Random();
 
@@ -36,21 +36,17 @@ namespace frontend_app
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            userNameTextBox.Text = $"user_{rnd.Next(1111, 9999)}";
+
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void UpdateIpVar()
         {
             if (serverIPTextBox.Text != "")
             {
                 serverAddress = serverIPTextBox.Text;
             }
-
-            socketIoManager();
-
-            button1.Enabled = false;
-            sendMessageBtn.Enabled = true;
         }
+
 
         private async void socketIoManager()
         {
@@ -147,12 +143,21 @@ namespace frontend_app
 
         public class MessageDTO
         {
-            public string name { get; set; }
+            public string token { get; set; }
             public string message { get; set; }
         }
 
         public class LoginDTO
         {
+            public string email { get; set; }
+
+            public string password { get; set; }
+        }
+
+        public class RegisterDTO
+        {
+            public string username { get; set; }
+
             public string email { get; set; }
 
             public string password { get; set; }
@@ -169,7 +174,7 @@ namespace frontend_app
         {
             if (client == null || userMsgTextBox.Text.Length <= 0) return;
 
-            client.EmitAsync("message", new MessageDTO { name = userNameTextBox.Text, message = userMsgTextBox.Text });
+            client.EmitAsync("message", new MessageDTO { token = sessionToken, message = userMsgTextBox.Text });
             userMsgTextBox.Text = "";
         }
 
@@ -177,7 +182,10 @@ namespace frontend_app
         {
             e.DrawBackground();
             e.DrawFocusRectangle();
-            e.Graphics.DrawString(listBox1.Items[e.Index].ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds);
+            try
+            {
+                e.Graphics.DrawString(listBox1.Items[e.Index].ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds);
+            } catch {}
         }
 
         private void listBox1_MeasureItem(object sender, MeasureItemEventArgs e)
@@ -185,35 +193,100 @@ namespace frontend_app
             e.ItemHeight = (int)e.Graphics.MeasureString(listBox1.Items[e.Index].ToString(), listBox1.Font, listBox1.Width).Height;
         }
 
+        private void ClearFields()
+        {
+            registerEmailTextBox.Clear();
+            registerPasswordTextBox.Clear();
+            registerUsernameTextBox.Clear();
+            emailTextBox.Clear();
+            passwordTextBox.Clear();
+        }
+
+        private void InitializeChat()
+        {
+            UpdateIpVar();
+
+            socketIoManager();
+
+            sendMessageBtn.Enabled = true;
+            userMsgTextBox.Enabled = true;
+
+            registerEmailTextBox.Enabled = false;
+            registerPasswordTextBox.Enabled = false;
+            registerUsernameTextBox.Enabled = false;
+            emailTextBox.Enabled = false;
+            passwordTextBox.Enabled = false;
+            loginBtn.Enabled = false;
+            registerBtn.Enabled = false;
+        }
+
         private async void Login()
         {
-            var myJson = Newtonsoft.Json.JsonConvert.SerializeObject(new LoginDTO { email = emailTextBox.Text, password = passwordTextBox.Text });
+            var loginObj = Newtonsoft.Json.JsonConvert.SerializeObject(new LoginDTO { email = emailTextBox.Text, password = passwordTextBox.Text });
 
             using (var client = new HttpClient())
             {
                 var response = await client.PostAsync(
                     $"{serverAddress}/users/login",
-                     new StringContent(myJson, Encoding.UTF8, "application/json"));
+                     new StringContent(loginObj, Encoding.UTF8, "application/json"));
 
-                var contents = await response.Content.ReadAsStringAsync();
-                var responseObj = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDTO>(contents);
+                var bodyContents = await response.Content.ReadAsStringAsync();
+                var responseObj = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDTO>(bodyContents);
 
                 if (responseObj.token != null)
                 {
                     sessionTokenLabel.Text = $"session: {responseObj.token}";
                     sessionToken = responseObj.token;
                 }
+
+                if (responseObj.message != null)
+                {
+                    MessageBox.Show(responseObj.message);
+                }
+
+                if (response.StatusCode == HttpStatusCode.Created)
+                {
+                    ClearFields();
+                    InitializeChat();
+                }
             }
         }
 
         private void loginBtn_Click(object sender, EventArgs e)
         {
-            if (serverIPTextBox.Text != "")
-            {
-                serverAddress = serverIPTextBox.Text;
-            }
-
+            UpdateIpVar();
             Login();
+        }
+
+        private async void Register()
+        {
+            var registerObj = Newtonsoft.Json.JsonConvert.SerializeObject(new RegisterDTO { username = registerUsernameTextBox.Text, email = registerEmailTextBox.Text, password = registerPasswordTextBox.Text });
+
+            using (var client = new HttpClient())
+            {
+                var response = await client.PostAsync(
+                    $"{serverAddress}/users/register",
+                     new StringContent(registerObj, Encoding.UTF8, "application/json"));
+
+                var bodyContents = await response.Content.ReadAsStringAsync();
+                var responseObj = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDTO>(bodyContents);
+
+                if (responseObj.message != null)
+                {
+                    MessageBox.Show(responseObj.message);
+                }
+
+                if (response.StatusCode == HttpStatusCode.Created)
+                {
+                    ClearFields();
+                }
+            }
+        }
+
+        private void registerBtn_Click(object sender, EventArgs e)
+        {
+            UpdateIpVar();
+            Register();
         }
     }
 }
