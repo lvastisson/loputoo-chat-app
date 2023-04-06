@@ -1,4 +1,4 @@
 export interface MessageDTO {
-  name: string;
+  token: string;
   message: string;
 }

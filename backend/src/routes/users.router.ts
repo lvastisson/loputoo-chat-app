@@ -40,7 +40,7 @@ usersRouter.post("/login", async (req: Request, res: Response) => {
     const { email, password } = req.body as LoginDto;
 
     const user = (await collections.users?.findOne<User>({ email: email })) as User;
-    if (!user) return res.status(400).send({ message: `User with email ${email} doesn't exist`});
+    if (!user) return res.status(400).send({ message: `User with email ${email} doesn't exist` });
 
     const passwordMatches = await bcrypt.compare(password, user.passwordHash);
     if (!passwordMatches) return res.status(400).send({ message: "Wrong password" });
@@ -48,12 +48,15 @@ usersRouter.post("/login", async (req: Request, res: Response) => {
     const generatedRandomID = crypto.randomBytes(8).toString("hex");
 
     const result = await collections.users?.updateOne(
-      { _id: new ObjectId(user.id) },
+      { _id: new ObjectId(user._id) },
       { $set: { sessionId: generatedRandomID } }
     );
 
     result
-      ? res.status(201).send({ message: `Successfully generated session for user ${user.username} with id ${generatedRandomID}`, token: generatedRandomID })
+      ? res.status(201).send({
+          message: `Successfully generated session for user ${user.username} with id ${generatedRandomID}`,
+          token: generatedRandomID,
+        })
       : res.status(500).send({ message: "Failed to generate session" });
   } catch (error: any) {
     console.error(error);
@@ -66,14 +69,11 @@ usersRouter.post("/logout", isAuth, async (req: Request, res: Response) => {
     const user = (await collections.users?.findOne<User>({ sessionId: req.session?.sessionid })) as User;
     if (!user) return res.status(400).send({ message: "Session doesn't exist" });
 
-    const result = await collections.users?.updateOne(
-      { _id: new ObjectId(user.id) },
-      { $set: { sessionId: '' } }
-    );
+    const result = await collections.users?.updateOne({ _id: new ObjectId(user._id) }, { $set: { sessionId: "" } });
 
     result
       ? res.status(201).send({ message: `Successfully logged out user ${user.username} with id ${user.sessionId}` })
-      : res.status(500).send({ message: 'Failed to logout' });
+      : res.status(500).send({ message: "Failed to logout" });
   } catch (error: any) {
     console.error(error);
     res.status(400).send({ message: error.message });

@@ -12,7 +12,7 @@ messagesRouter.get("/", isAuth, async (req: Request, res: Response) => {
   try {
     const messages = (await collections.messages?.find<Message>({}).toArray()) as Message[];
 
-    res.status(200).send({ messages, session: req.session });
+    res.status(200).send(messages);
   } catch (error: any) {
     res.status(500).send(error.message);
   }
@@ -20,7 +20,7 @@ messagesRouter.get("/", isAuth, async (req: Request, res: Response) => {
 
 messagesRouter.post("/", isAuth, async (req: Request, res: Response) => {
   try {
-    const newMessage = req.body as Message;
+    const newMessage = { ...req.body, userId: req.session?.userid } as Message;
     const result = await collections.messages?.insertOne(newMessage);
 
     result

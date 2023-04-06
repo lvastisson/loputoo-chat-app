@@ -1,11 +1,13 @@
 import express, { Application } from "express";
-import { connectToDatabase } from "./services/database.service";
+import { collections, connectToDatabase } from "./services/database.service";
 import { messagesRouter } from "./routes/messages.router";
 import { Server } from "socket.io";
 import { usersRouter } from "./routes/users.router";
 import { MessageDTO } from "./interfaces/Socket/message.intefaces";
 import { statusRouter } from "./routes/status.router";
 import { UserSession } from "./interfaces/session.interfaces";
+import User from "./models/user";
+import Message from "./models/message";
 
 declare global {
   namespace Express {
@@ -44,8 +46,18 @@ connectToDatabase()
 
       socket.emit("message", `[${getTime()}] SERVER: ühendus loodud`);
 
-      socket.on("message", function (data: MessageDTO) {
-        if (data.message.length > 0) io.emit("message", `[${getTime()}] [${data.name}] ${data.message}`);
+      socket.on("message", async function (data: MessageDTO) {
+        if (!data.token) return;
+
+        const user = (await collections.users?.findOne<User>({ sessionId: data.token })) as User;
+        if (!user) return;
+
+        if (data.message.length > 0) {
+          const newMessage = { userId: user._id || "null", message: data.message, time: getTime() } as Message;
+          const result = await collections.messages?.insertOne(newMessage);
+
+          if (result) io.emit("message", `[${getTime()}] [${user.username}] ${data.message}`);
+        }
       });
 
       socket.on("disconnect", function () {

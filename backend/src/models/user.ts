@@ -6,6 +6,6 @@ export default class User {
     public email: string,
     public passwordHash: string,
     public sessionId?: string,
-    public id?: ObjectId
+    public _id?: ObjectId
   ) {}
 }
