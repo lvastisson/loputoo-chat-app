@@ -10,7 +10,7 @@ export default async function(req: Request, res: Response, next: NextFunction) {
       const token = authHeader.split(' ');
       
       if (token[0] === 'Bearer') {
-        const user = (await collections.users?.findOne<User>({ sessionId: token })) as User;
+        const user = (await collections.users?.findOne<User>({ sessionId: token[1] })) as User;
   
         if (user) {
           req.session = { sessionid: token[1], username: user.username, email: user.email };
