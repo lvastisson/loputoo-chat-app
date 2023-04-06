@@ -24,7 +24,7 @@ export default async function(req: Request, res: Response, next: NextFunction) {
       }
     }
     
-    res.sendStatus(403).send(debug);
+    res.status(403).send(debug);
   } catch (error: any) {
     console.error(error);
     res.status(400).send(error.message);
