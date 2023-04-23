@@ -25,8 +25,6 @@ namespace frontend_app
 
         string serverAddress = "http://localhost:5000";
 
-        Random rnd = new Random();
-
         SocketIO client = null;
 
         public Form1()
@@ -50,8 +48,6 @@ namespace frontend_app
 
         private async void socketIoManager()
         {
-            AddMessage($"socketIoManager called, isrunning: {isRunning}");
-
             if (isRunning) return;
 
             isRunning = true;
@@ -59,12 +55,6 @@ namespace frontend_app
             try
             {
                 client = new SocketIO(serverAddress);
-                Debug.WriteLine("past socket initalization");
-
-                client.OnConnected += async (sender, e) =>
-                {
-                    Debug.WriteLine("ühendatud");
-                };
 
                 client.OnDisconnected += async (sender, e) =>
                 {
@@ -73,7 +63,6 @@ namespace frontend_app
 
                 client.On("hello", (data) =>
                 {
-                    Debug.WriteLine(data.GetValue<string>());
                     UpdateStatus(data.GetValue<string>());
                 });
 
@@ -105,12 +94,9 @@ namespace frontend_app
                 this.label1.Text = text;
 
                 if (error)
-                {
                     label1.ForeColor = Color.Red;
-                } else
-                {
+                else
                     label1.ForeColor = Color.Green;
-                }
             }
         }
 
@@ -150,23 +136,19 @@ namespace frontend_app
         public class LoginDTO
         {
             public string email { get; set; }
-
             public string password { get; set; }
         }
 
         public class RegisterDTO
         {
             public string username { get; set; }
-
             public string email { get; set; }
-
             public string password { get; set; }
         }
 
         public class UserResponseDTO
         {
             public string message { get; set; }
-
             public string token { get; set; }
         }
 
@@ -225,14 +207,11 @@ namespace frontend_app
         private void InitializeChat()
         {
             UpdateIpVar();
-
             socketIoManager();
-
             LoadPreviousMessages();
 
             sendMessageBtn.Enabled = true;
             userMsgTextBox.Enabled = true;
-
             registerEmailTextBox.Enabled = false;
             registerPasswordTextBox.Enabled = false;
             registerUsernameTextBox.Enabled = false;
@@ -262,9 +241,7 @@ namespace frontend_app
                 }
 
                 if (responseObj.message != null)
-                {
                     MessageBox.Show(responseObj.message);
-                }
 
                 if (response.StatusCode == HttpStatusCode.Created)
                 {
