@@ -16,10 +16,10 @@ usersRouter.post("/register", async (req: Request, res: Response) => {
     const { email, username, password } = req.body as RegisterDto;
 
     const checkUsernameExists = (await collections.users?.findOne<User>({ username: username })) as User;
-    if (checkUsernameExists) return res.status(400).send({ message: `User with username ${username} already exists` });
+    if (checkUsernameExists) return res.status(400).send({ message: `Nimi ${username} on juba kasutusel` });
 
     const checkEmailExists = (await collections.users?.findOne<User>({ email: email })) as User;
-    if (checkEmailExists) return res.status(400).send({ message: `User with email ${email} already exists` });
+    if (checkEmailExists) return res.status(400).send({ message: `Meil ${email} on juba kasutusel` });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = { email, username, passwordHash: hashedPassword } as User;
@@ -27,8 +27,8 @@ usersRouter.post("/register", async (req: Request, res: Response) => {
     const result = await collections.users?.insertOne(newUser);
 
     result
-      ? res.status(201).send({ message: `Successfully registered new user with id ${result.insertedId}` })
-      : res.status(500).send({ message: "Failed to register user." });
+      ? res.status(201).send({ message: `Edukalt registreeritud uus kasutaja ID'ga ${result.insertedId}` })
+      : res.status(500).send({ message: "Registreerumine ebaõnnestus" });
   } catch (error: any) {
     console.error(error);
     res.status(400).send({ message: error.message });
@@ -40,10 +40,10 @@ usersRouter.post("/login", async (req: Request, res: Response) => {
     const { email, password } = req.body as LoginDto;
 
     const user = (await collections.users?.findOne<User>({ email: email })) as User;
-    if (!user) return res.status(400).send({ message: `User with email ${email} doesn't exist` });
+    if (!user) return res.status(400).send({ message: `${email} meiliga kasutajat ei eksisteeri` });
 
     const passwordMatches = await bcrypt.compare(password, user.passwordHash);
-    if (!passwordMatches) return res.status(400).send({ message: "Wrong password" });
+    if (!passwordMatches) return res.status(400).send({ message: "Valed andmed" });
 
     const generatedRandomID = crypto.randomBytes(8).toString("hex");
 
@@ -54,10 +54,10 @@ usersRouter.post("/login", async (req: Request, res: Response) => {
 
     result
       ? res.status(201).send({
-          message: `Successfully generated session for user ${user.username} with id ${generatedRandomID}`,
+          message: `Sessioon avatud kasutajale ${user.username} ID'ga ${generatedRandomID}`,
           token: generatedRandomID,
         })
-      : res.status(500).send({ message: "Failed to generate session" });
+      : res.status(500).send({ message: "Sessiooni avamine ebaõnnestus" });
   } catch (error: any) {
     console.error(error);
     res.status(400).send({ message: error.message });
@@ -67,13 +67,13 @@ usersRouter.post("/login", async (req: Request, res: Response) => {
 usersRouter.post("/logout", isAuth, async (req: Request, res: Response) => {
   try {
     const user = (await collections.users?.findOne<User>({ sessionId: req.session?.sessionid })) as User;
-    if (!user) return res.status(400).send({ message: "Session doesn't exist" });
+    if (!user) return res.status(400).send({ message: "Sessiooni ei eksisteeri" });
 
     const result = await collections.users?.updateOne({ _id: new ObjectId(user._id) }, { $set: { sessionId: "" } });
 
     result
-      ? res.status(201).send({ message: `Successfully logged out user ${user.username} with id ${user.sessionId}` })
-      : res.status(500).send({ message: "Failed to logout" });
+      ? res.status(201).send({ message: `Edukalt välja logitud kasutaja ${user.username} ID'ga ${user.sessionId}` })
+      : res.status(500).send({ message: "Väljalogimine ebaõnnestus" });
   } catch (error: any) {
     console.error(error);
     res.status(400).send({ message: error.message });

@@ -30,7 +30,7 @@ const socketServer = (httpServer: http.Server) => {
   const io = new Server(httpServer);
 
   io.on("connection", (socket) => {
-    console.log("user connected");
+    console.log("uus ühendus");
 
     socket.emit("hello", "ühendus olemas");
 
@@ -56,7 +56,7 @@ const socketServer = (httpServer: http.Server) => {
     });
 
     socket.on("disconnect", function () {
-      console.log("user disconnected");
+      console.log("ühendus katkes");
     });
   });
 };
@@ -70,12 +70,12 @@ connectToDatabase()
     app.use("/status", statusRouter);
 
     const httpServer = app.listen(API_PORT, () => {
-      console.log(`Server started at http://localhost:${API_PORT}`);
+      console.log(`Server jookseb URL'il: http://localhost:${API_PORT}`);
     });
 
     socketServer(httpServer);
   })
   .catch((error: Error) => {
-    console.error("ERROR: Database connection failed", error);
+    console.error("ERROR: andmebaasiga ühenduse loomine ebaõnnestus", error);
     process.exit();
   });

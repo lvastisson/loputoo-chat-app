@@ -34,8 +34,8 @@ messagesRouter.post("/", isAuth, async (req: Request, res: Response) => {
     const result = await collections.messages?.insertOne(newMessage);
 
     result
-      ? res.status(201).send(`Successfully created a new message with id ${result.insertedId}`)
-      : res.status(500).send("Failed to create a new message.");
+      ? res.status(201).send(`Edukalt lisatud uus sõnum ID'ga ${result.insertedId}`)
+      : res.status(500).send("Uue sõnumi lisamine ebaõnnestus");
   } catch (error: any) {
     console.error(error);
     res.status(400).send(error.message);
