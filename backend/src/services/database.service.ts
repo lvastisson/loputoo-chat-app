@@ -24,6 +24,6 @@ export async function connectToDatabase() {
     collections.users = usersCollection;
     console.log(`Successfully connected to collection: ${usersCollection.collectionName}`);
   } catch {
-    console.log(`Error connecting to users collection`);
+    console.log(`Error connecting to USERS collection`);
   }
 }
